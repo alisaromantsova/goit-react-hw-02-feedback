@@ -1,19 +1,22 @@
 import { Component } from 'react';
 import { Section } from './Section/Section';
-
+import { Statistics } from 'components/Statistics/Statistics';
+import { FeedbackOptions } from 'components/FeedbackOptions/FeedbackOptions';
+import { Notification } from 'components/Notification/Notification';
 export class App extends Component {
   state = {
     good: 0,
     neutral: 0,
     bad: 0,
   };
-  total = 0;
+  // total = 0;
   positive = 0;
   onButtonClick = e => {
     const name = e.target.dataset.name;
-    this.setState({
-      [name]: this.state[name] + 1,
-    });
+    this.setState(prevState => ({
+      [name]: prevState[name] + 1,
+    }));
+    // console.log(this.state);
     this.countTotalFeedback();
     this.countPositiveFeedbackPercentage();
   };
@@ -35,18 +38,27 @@ export class App extends Component {
     return positive;
   }
   render() {
-    console.log(this.state);
+    const options = Object.keys(this.state);
+    // console.log(this.state.good);
     return (
-      <Section
-        title="Please leave feedback"
-        good={this.state.good}
-        neutral={this.state.neutral}
-        bad={this.state.bad}
-        total={this.countTotalFeedback()}
-        positivePercentage={this.countPositiveFeedbackPercentage()}
-        onButton={this.onButtonClick}
-        options={['good', 'neutral', 'bad']}
-      />
+      <>
+        <Section title="Please leave feedback">
+          <FeedbackOptions onButton={this.onButtonClick} options={options} />
+        </Section>
+        <Section title="Statistics" total={this.total}>
+          {this.countTotalFeedback() !== 0 ? (
+            <Statistics
+              good={this.state.good}
+              neutral={this.state.neutral}
+              bad={this.state.bad}
+              total={this.countTotalFeedback()}
+              positivePercentage={this.countPositiveFeedbackPercentage()}
+            />
+          ) : (
+            <Notification message="There is no feedback" />
+          )}
+        </Section>
+      </>
     );
   }
 }
